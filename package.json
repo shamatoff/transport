@@ -1,0 +1,24 @@
+{
+  "name": "transport",
+  "version": "0.0.1",
+  "description": "Simple transport app.",
+  "main": "index.js",
+  "scripts": {
+      "prestart": "npm install",
+      "postinstall": "bower install"
+  },
+  "keywords": [
+    "transport",
+    "shipments",
+    "driver"
+  ],
+  "author": "Peter Petrov",
+  "license": "MIT",
+  "dependencies": {
+    "body-parser": "^1.17.2",
+    "express": "^4.15.3",
+    "express-session": "^1.15.4",
+    "mongoose": "^4.11.4",
+    "pug": "^2.0.0-rc.2"
+  }
+}

@@ -1,0 +1,185 @@
+doctype html
+html.
+  <head>
+    <title>Transport</title>
+    <base href="/" />
+    <!-- CSS libraries -->
+    <link rel="stylesheet" type="text/css" href="vendors/bootstrap/dist/css/bootstrap.css" />
+    <link rel="stylesheet" type="text/css" href="vendors/bootstrap-daterangepicker/daterangepicker.css" />
+
+    <!-- CSS client code -->
+    <link rel="stylesheet" type="text/css" href="resources/styles/main.css" />
+
+  </head>
+  <body data-ng-app="app" data-ng-controller="MainCtrl">
+    <div class="navbar navbar-inverse" id="navbar">
+    	<div class="container">
+    		<div class="navbar-header">
+    			<button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+    				<span class="icon-bar"></span>
+    				<span class="icon-bar"></span>
+    				<span class="icon-bar"></span>
+    			</button>
+    			<a class="navbar-brand" href="/">Transport LTD</a>
+    		</div>
+    		<div class="navbar-collapse collapse" aria-expanded="false" style="height: 1px;">
+    			<ul class="nav navbar-nav navbar-right"></ul>
+    		</div><!--/.nav-collapse -->
+    	</div>
+    </div>
+
+    <div class="container">
+      <div class="row">
+        <div class="col-md-12">
+          <ul class="nav nav-tabs">
+            <li class="active">
+              <a href="#all" data-toggle="tab" aria-expanded="true">All Shipments</a>
+            </li>
+            <li class="" data-ng-click="gotoAddShipment()">
+              <a href="#add-shipment" data-toggle="tab" aria-expanded="false">Add Shipment</a>
+            </li>
+            <li class="">
+              <a href="#add-truck" data-toggle="tab" aria-expanded="false">Add Truck</a>
+            </li>
+          </ul>
+          <div id="myTabContent" class="tab-content">
+            <!-- All Shipments content -->
+            <div class="tab-pane fade active in" id="all">
+              <div class="alert alert-warning" data-ng-if="!shipments.length">
+                <div>No shipments</div>
+              </div>
+              <table class="table table-striped table-hover" data-ng-if="shipments.length">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Transport From/To</th>
+                    <th>Cargo Type</th>
+                    <th>Truck Data</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr data-ng-repeat="shipment in shipments track by $index">
+                    <td>{{$index + 1}}</td>
+                    <td>{{shipment.timeslot}}</td>
+                    <td>{{shipment.cargo.type}}</td>
+                    <td>{{shipment.truck.licensePlate}} (driver: {{shipment.truck.driverName}})</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Add SHIPMENT form -->
+            <div class="tab-pane fade" id="add-shipment">
+
+              <div class="alert alert-dismissible alert-info">
+                <button type="button" class="close" data-dismiss="alert">&times;</button>
+                <strong>Note!</strong> Available trucks will be displayed depending of the time slot you choose.
+              </div>
+
+              <form class="form-horizontal">
+                <fieldset>
+                  <legend>Shipment details</legend>
+
+                  <div class="raw form-group">
+                    <label class="col-md-3 control-label" for="shipmentDuration">Shipment time/duration</label>
+                    <div class="col-md-9">
+                      <input data-ng-model="nextShipment.timeslot" data-ng-change="checkForTrucks(nextShipment.timeslot)" class="form-control" id="shipmentDuration" type="text" name="daterange" />
+                    </div>
+                  </div>
+
+                  <div class="row form-group">
+                      <label class="col-md-3 control-label" for="cargoType">Cargo type</label>
+                      <div class="col-md-9">
+                        <select ng-model="nextShipment.cargo" class="form-control form-control-sm" id="cargoType" ng-options="cargo as cargo.type for (id, cargo) in cargoTypes track by cargo.type"></select>
+                      </div>
+                  </div>
+
+                  <div class="row form-group">
+                      <label class="col-md-3 control-label" for="truckToUse">Truck</label>
+                      <div class="col-md-9">
+                        <select ng-model="nextShipment.truck" class="form-control form-control-sm" id="truckToUse" ng-options="truckToUse as (truckToUse.licensePlate + ' (driver: ' + truckToUse.driverName + ')') for (id, truckToUse) in trucks track by truckToUse.licensePlate"></select>
+                      </div>
+                  </div>
+
+                  <div class="row form-group">
+
+                  </div>
+                </fieldset>
+
+                <div calss="row">
+                  <a href="#" class="btn btn-primary btn-lg pull-right" data-ng-click="addShipment(nextShipment)">Submit</a>
+                </div>
+              </form>
+            </div>
+
+            <!-- Add TRUCK form -->
+            <div class="tab-pane fade" id="add-truck">
+              <div class="alert alert-dismissible alert-info">
+                <button type="button" class="close" data-dismiss="alert">&times;</button>
+                <strong>Note!</strong> You cannot add date that is overlapping with another one or is in the past.
+              </div>
+
+              <form class="form-horizontal">
+                <legend>Truck details</legend>
+                <fieldset>
+                  <div class="raw form-group">
+                    <label class="col-md-3 control-label" for="licensePlate">License plate</label>
+                    <div class="col-md-9">
+                      <input data-ng-model="truck.licensePlate" class="form-control" id="licensePlate" type="text" placeholder="Add license plate">
+                    </div>
+                  </div>
+
+                  <div class="raw form-group">
+                    <label class="col-md-3 control-label" for="driverName">Driver name</label>
+                    <div class="col-md-9">
+                      <input data-ng-model="truck.driverName" class="form-control" id="driverName" type="text" placeholder="Add driver name">
+                    </div>
+                  </div>
+                </fieldset>
+
+                <fieldset>
+                  <legend>Truck availability</legend>
+                  <div class="raw form-group">
+                    <label class="col-md-3 control-label" for="addAvail">Add availability</label>
+                    <div class="col-md-6">
+                      <input data-ng-model="nextDate" class="form-control" id="addAvail" type="text" name="daterange" />
+                    </div>
+                    <button data-ng-click="addDate(nextDate)" class="btn btn-default col-md-3" type="button">ADD</button>
+                  </div>
+                </fieldset>
+
+                <fieldset>
+                  <div class="raw form-group">
+                    <div class="input-group col-md-6 col-md-offset-3" data-ng-repeat="date in availabilityDates" >
+                      <span class="form-control">{{date}}</span>
+                      <span class="input-group-btn">
+                        <button data-ng-click="removeDate(date)" class="btn btn-default" type="button">REMOVE</button>
+                      </span>
+                    </div>
+                  </div>
+                </fieldset>
+
+                <div calss="row">
+                  <a href="#" class="btn btn-primary btn-lg pull-right" data-ng-click="createTruck(truck, availabilityDates)">Submit</a>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- JS libraries -->
+    <script type="text/javascript" src="vendors/jquery/dist/jquery.min.js"></script>
+    <script type="text/javascript" src="vendors/moment/min/moment.min.js"></script>
+    <script type="text/javascript" src="vendors/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="vendors/angular/angular.min.js"></script>
+    <script type="text/javascript" src="vendors/angular-resource/angular-resource.js"></script>
+    <script type="text/javascript" src="vendors/angular-sanitize/angular-sanitize.min.js"></script>
+    <script type="text/javascript" src="vendors/bootstrap-daterangepicker/daterangepicker.js"></script>
+
+    <!-- JS client code -->
+    <script type="text/javascript" src="resources/scripts/app.js"></script>
+  	<script type="text/javascript" src="resources/scripts/ctrls.js"></script>
+  	<script type="text/javascript" src="resources/scripts/data.js"></script>
+  </body>
