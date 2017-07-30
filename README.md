@@ -7,3 +7,6 @@ Simple freight truck management application.
 $ npm start
 ```
 2. Open localhost on port 3030
+
+### Requirements
+1. Installed Node.js (preferably v6.9.1)
